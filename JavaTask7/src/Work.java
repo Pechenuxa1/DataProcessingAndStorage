@@ -3,30 +3,38 @@ import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-public class Workers {
+public class Work {
   List<Runnable> workers;
   int numOfThreads;
-  List<Calculate> calculate;
+  List<Calculation> calculations = new ArrayList<>();
   private final CyclicBarrier BARRIER;
   private double result = 0;
-  Workers(int numOfThreads, List<Calculate> calculate) {
+
+  Work(int numOfThreads) {
     workers = new ArrayList<>(numOfThreads);
     this.numOfThreads = numOfThreads;
-    this.calculate = calculate;
     BARRIER = new CyclicBarrier(numOfThreads, () -> {
-      for (Calculate calculate1 : calculate) {
-        result += calculate1.getPartResult();
+      for (Calculation calculation : calculations) {
+        result += calculation.getPartResult();
       }
       result *= 4;
-      //result = calculate.stream().map(Calculate::getPartResult).reduce(Double::sum).orElse((double) -1);
       System.out.println(result);
     });
   }
-  private void init() {
+
+  private void initCalc() {
+    int denominator = 1;
+    for (int i = 1; i <= numOfThreads; i++) {
+      calculations.add(new Calculation(denominator, i, numOfThreads));
+      denominator += 2;
+    }
+  }
+
+  private void initWorkers() {
     for (int i = 0; i < numOfThreads; i++) {
       int finalI = i;
       workers.add(() -> {
-        calculate.get(finalI).run();
+        calculations.get(finalI).run();
         try {
           BARRIER.await();
         } catch (InterruptedException | BrokenBarrierException e) {
@@ -35,8 +43,10 @@ public class Workers {
       });
     }
   }
-  public void start() {
-    init();
+
+  public void startCalc() {
+    initCalc();
+    initWorkers();
     for (Runnable worker : workers) {
       new Thread(worker).start();
     }

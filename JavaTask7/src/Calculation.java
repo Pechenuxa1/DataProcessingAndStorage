@@ -1,13 +1,11 @@
-import java.util.concurrent.BrokenBarrierException;
-
-public class Calculate {
+public class Calculation {
 
   double partResult = 0;
   double denominator;
   int sequenceNumber;
   int numOfThreads;
 
-  Calculate(int firstDenominator, int sequenceNumber, int numOfThreads) {
+  Calculation(int firstDenominator, int sequenceNumber, int numOfThreads) {
     denominator = firstDenominator;
     this.sequenceNumber = sequenceNumber;
     this.numOfThreads = numOfThreads;
