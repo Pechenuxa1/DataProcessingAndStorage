@@ -14,10 +14,7 @@ public class Work {
     workers = new ArrayList<>(numOfThreads);
     this.numOfThreads = numOfThreads;
     BARRIER = new CyclicBarrier(numOfThreads, () -> {
-      for (Calculation calculation : calculations) {
-        result += calculation.getPartResult();
-      }
-      result *= 4;
+      result = calculations.stream().map(Calculation::getPartResult).reduce(0.0, Double::sum) * 4.0;
       System.out.println(result);
     });
   }
