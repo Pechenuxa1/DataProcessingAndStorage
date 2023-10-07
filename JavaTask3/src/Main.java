@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Task3 {
+public class Main {
   static ArrayList<String> strings1 = new ArrayList<>(Arrays.asList("a", "b", "c"));
   static ArrayList<String> strings2 = new ArrayList<>(Arrays.asList("d", "e", "f"));
   static ArrayList<String> strings3 = new ArrayList<>(Arrays.asList("g", "h", "i"));
