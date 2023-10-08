@@ -7,8 +7,6 @@ public class ProductionLine implements Runnable {
 
   ManufacturerOfDetailC detailC;
   ManufacturerOfModuleAB moduleAB;
-  Thread createC = new Thread(detailC);
-  Thread createAB = new Thread(moduleAB);
 
   ProductionLine(int numOfWidgets) {
     this.numOfWidgets = numOfWidgets;
@@ -18,6 +16,8 @@ public class ProductionLine implements Runnable {
 
   @Override
   public void run() {
+    Thread createC = new Thread(detailC);
+    Thread createAB = new Thread(moduleAB);
     createC.start();
     createAB.start();
     for (int i = 0; i < numOfWidgets; i++) {
