@@ -9,11 +9,13 @@ public class Work {
   List<Runnable> workers;
   int numOfThreads;
   List<Calculation> calculations = new ArrayList<>();
+  CyclicBarrier barrier;
   private double result = 0;
 
   Work(int numOfThreads) {
     workers = new ArrayList<>(numOfThreads);
     this.numOfThreads = numOfThreads;
+    barrier = new CyclicBarrier(numOfThreads);
     Signal.handle(new Signal("INT"), sig -> {
       result = calculations.stream().map(Calculation::getPartResult).reduce(0.0, Double::sum) * 4.0;
       System.out.println(result);
@@ -24,7 +26,7 @@ public class Work {
   private void initCalc() {
     int denominator = 1;
     for (int i = 1; i <= numOfThreads; i++) {
-      calculations.add(new Calculation(denominator, i, numOfThreads));
+      calculations.add(new Calculation(denominator, i, numOfThreads, barrier));
       denominator += 2;
     }
   }
