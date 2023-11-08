@@ -4,7 +4,6 @@ public class Philosopher implements Runnable {
     private final int name;
     private boolean isLeftFork;
     private boolean isRightFork;
-    private final Object forks;
 
     Philosopher(Object leftFork, Object rightFork, int name, boolean isLeftFork, boolean isRightFork) {
         this.leftFork = leftFork;
@@ -12,7 +11,6 @@ public class Philosopher implements Runnable {
         this.name = name;
         this.isLeftFork = isLeftFork;
         this.isRightFork = isRightFork;
-        forks = new Object();
     }
 
     @Override
@@ -20,23 +18,25 @@ public class Philosopher implements Runnable {
         while (true) {
             try {
                 think();
-                synchronized (forks) {
-                    while (!isLeftFork || !isRightFork) {
-                        forks.wait();
-                    }
-                    synchronized (leftFork) {
-                        isLeftFork = false;
-                        tookFork("left");
-                        synchronized (rightFork) {
-                            isRightFork = false;
-                            tookFork("right");
-                            eating();
-                            putDownFork("right");
-                            isRightFork = true;
-                        }
-                        putDownFork("left");
+                synchronized (leftFork) {
+                    isLeftFork = false;
+                    tookFork("left");
+                    while (!isRightFork) {
                         isLeftFork = true;
+                        putDownFork("left");
+                        leftFork.wait();
+                        tookFork("left");
                     }
+                    synchronized (rightFork) {
+                        isRightFork = false;
+                        tookFork("right");
+                        eating();
+                        putDownFork("right");
+                        isRightFork = true;
+                    }
+                    putDownFork("left");
+                    isLeftFork = true;
+                    leftFork.notify();
                 }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
