@@ -14,6 +14,37 @@ public class Server {
         while(true) {
             Socket clientSocket = serverSocket.accept();
             Socket targetSocket = new Socket(targetHost, targetPort);
+
+            Thread targetToClient = new Thread(() -> {
+                try {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(targetSocket.getInputStream()));
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+                    String message;
+                    while(!Objects.equals(message = reader.readLine(), " ")) {
+                        writer.write(message);
+                        writer.flush();
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            Thread clientToTarget = new Thread(() -> {
+                try {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(targetSocket.getOutputStream()));
+
+                    String message;
+                    while(!Objects.equals(message = reader.readLine(), " ")) {
+                        writer.write(message);
+                        writer.flush();
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            targetToClient.start();
+            clientToTarget.start();
+
         }
     }
 }
