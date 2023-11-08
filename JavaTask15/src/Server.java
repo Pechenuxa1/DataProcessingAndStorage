@@ -17,12 +17,19 @@ public class Server {
 
             Thread targetToClient = new Thread(() -> {
                 try {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(targetSocket.getInputStream()));
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+                    //BufferedReader reader = new BufferedReader(new InputStreamReader(targetSocket.getInputStream()));
+                    //BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+
+                    InputStream reader = targetSocket.getInputStream();
+                    OutputStream writer = clientSocket.getOutputStream();
+
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+
                     String message;
-                    while(!Objects.equals(message = reader.readLine(), " ")) {
-                        writer.write(message);
-                        writer.flush();
+                    while((bytesRead = reader.read(buffer)) != -1) {
+                        writer.write(buffer);
+                        //writer.flush();
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -30,13 +37,20 @@ public class Server {
             });
             Thread clientToTarget = new Thread(() -> {
                 try {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(targetSocket.getOutputStream()));
+                    //BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    //BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(targetSocket.getOutputStream()));
+
+                    InputStream reader = clientSocket.getInputStream();
+                    OutputStream writer = targetSocket.getOutputStream();
+
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+
 
                     String message;
-                    while(!Objects.equals(message = reader.readLine(), " ")) {
-                        writer.write(message);
-                        writer.flush();
+                    while((bytesRead = reader.read(buffer)) != -1) {
+                        writer.write(buffer);
+                        //writer.flush();
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
